@@ -1,6 +1,7 @@
 *.[oa]
 *~
 Debug
+Debug/
 .vs
 *.ncb
 *.opt
