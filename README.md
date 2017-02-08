@@ -1,2 +1,2 @@
-# c-_Md5
-an example for md5 developed by c++
+# c++_Md5
+an example of md5 algorithm developed with c
