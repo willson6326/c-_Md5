@@ -1,61 +1,93 @@
 #include "stdafx.h"
-#include "md5.h"
+#include "CheckCodeGenerator.h"
 #include <iostream>
-#include <string>
-#include <algorithm>  
+#include <fstream>
+#include <sstream>
+#include <time.h>
 
 using namespace std;
 
-unsigned char* makeBetDetail(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
+void make(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber,string file)
 {
-	string betDetailStr = stationId + gameRule + issueNumber + runCode + sellDate + betNumber;
-	int len = betDetailStr.length();
+	CheckCodeGenerator checkCodeGenerator;
 
-	if (len < 178)
+	ofstream fout(file.c_str(),ios::app);
+	string temp = checkCodeGenerator.generateCheckCode(stationId, gameRule, issueNumber, runCode, sellDate, betNumber);
+	fout<<temp<<endl;
+	fout.close();
+}
+
+void testStationId(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
+{
+	int count = 99999999;
+	string file = "D:\\cfile\\station.txt";
+	while (count > 98999999)
 	{
-		betDetailStr.append(178 - len,'\0');
+		stringstream stream;  
+        stream<<count;  
+        stationId=stream.str();
+
+		make(stationId,gameRule,issueNumber,runCode,sellDate,betNumber,file);
+		count--;
 	}
-
-	char* betDetail = (char*)calloc(178, sizeof(char*)); 
-	strcpy(betDetail,betDetailStr.c_str());
-
-    return (unsigned char*)betDetail;
 }
 
-string getOdd(string src) 
+void testGameRule(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
 {
-	string result = "";
-    const char* srcChars = src.c_str();
-    for (int i = 0; i < src.length(); i++)
+	int count = 999;
+	string file = "D:\\cfile\\gameRule.txt";
+	while (count > 0)
 	{
-        if (i % 2 == 0) 
-		{
-            result.append(1,srcChars[i]);
-        }
-    }
-    for (int j = 0; j < src.length(); j++) 
-	{
-        if (j % 2 != 0) 
-		{
-            result.append(1,srcChars[j]);
-        }
-    }
-    return result;
+		stringstream stream;  
+        stream<<count;  
+        gameRule="B" + stream.str();
+
+		make(stationId,gameRule,issueNumber,runCode,sellDate,betNumber,file);
+		count--;
+	}
 }
 
-string generateCheckCode(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
+void testIssueNumber(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
 {
-	MD5 iMD5;
-	
-	unsigned char * betDetail = makeBetDetail(stationId, gameRule, issueNumber, runCode, sellDate, betNumber);
-    iMD5.GenerateMD5(betDetail, 178);
-	free(betDetail);
+	int count = 2005001;
+	string file = "D:\\cfile\\issueNumber.txt";
+	while (count < 2017999)
+	{
+		stringstream stream;  
+        stream<<count;  
+        issueNumber=stream.str();
 
-    string result = iMD5.ToString();
+		make(stationId,gameRule,issueNumber,runCode,sellDate,betNumber,file);
+		count++;
+	}
+}
 
-	transform(result.begin(), result.end(), result.begin(), ::toupper);  
+void testRunCode(string stationId,string gameRule,string issueNumber,string runCode,string sellDate,string betNumber)
+{
+	int count = 99999;
+	string file = "D:\\cfile\\runCode.txt";
+	while (count > 0)
+	{
+		stringstream stream;  
+        stream<<count;  
+        runCode=stream.str();
 
-	return getOdd(result);
+		make(stationId,gameRule,issueNumber,runCode,sellDate,betNumber,file);
+		count--;
+	}
+}
+
+void showTime()
+{
+	time_t tt = time(NULL);
+	tm* t= localtime(&tt);
+	printf("%d-%02d-%02d %02d:%02d:%02d\n", 
+		t->tm_year + 1900,
+		t->tm_mon + 1,
+		t->tm_mday,
+		t->tm_hour,
+		t->tm_min,
+		t->tm_sec);
 }
 
 int main()
@@ -67,15 +99,16 @@ int main()
 	string sellDate = "2005-03-09 18:18:18";
 	string betNumber = "01020304050607^08091011121314^15161718192021^22232425262728^29303132333435^";
 
-    string temp = generateCheckCode(stationId, gameRule, issueNumber, runCode, sellDate, betNumber);
+	cout << "begin time:" << endl;
+	showTime();
 	
-	cout<<temp<<endl;
+	testStationId(stationId,gameRule,issueNumber,runCode,sellDate,betNumber);
+	//testGameRule(stationId,gameRule,issueNumber,runCode,sellDate,betNumber);
+	//testIssueNumber(stationId,gameRule,issueNumber,runCode,sellDate,betNumber);
+	//testRunCode(stationId,gameRule,issueNumber,runCode,sellDate,betNumber);
 
-	cout<<stationId.length() + gameRule.length() + issueNumber.length() + runCode.length() + sellDate.length() + betNumber.length()<<endl;
-
-	unsigned char * betDetail = makeBetDetail(stationId, gameRule, issueNumber, runCode, sellDate, betNumber);
-	cout<<betDetail<<endl;
-	free(betDetail);
+	cout << "end time:" << endl;
+	showTime();
 
 	return 0;
 }
